@@ -6,52 +6,85 @@ using Random = UnityEngine.Random;
 public class Spawner : MonoBehaviour
 {
     [SerializeField] private List<SpawnPoint> _spawnPoints;
-    [SerializeField] private List<GameObject> _prefabsToSpawn;
-    [SerializeField] private int _count = 2;
 
     private Vector3 _oldSpawnPosition;
     private List<GameObject> _spawnedObjects = new List<GameObject>();
 
+    /// <summary>
+    /// All available spawn points.
+    /// </summary>
+    public List<SpawnPoint> SpawnPoints => _spawnPoints;
+
+    /// <summary>
+    /// All spawned objects.
+    /// </summary>
     public List<GameObject> SpawnedObjects => _spawnedObjects;
 
-    #region ONE TIME
-
-    private void Start()
+    /// <summary>
+    /// Spawn prefab in spawn point.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="spawnPoint"></param>
+    public void Spawn(GameObject prefab, SpawnPoint spawnPoint)
     {
-        SpawnAllObjects();
-    }
+        if (prefab == null)
+            throw new NullReferenceException("List of Prefabs is null");
 
-    #endregion
+        if (!spawnPoint)
+            throw new NullReferenceException("SpawnPoint is null");
 
-    public void SpawnAllObjects()
-    {
-        foreach (var spawnPoint in _spawnPoints)
+        if (!TryActivateObject(prefab, spawnPoint))
         {
-            for (int i = 0; i < _count; i++)
-            {
-                GameObject randomPrefab = GetRandomPrefab();
-
-                SpawnOnceObject(randomPrefab, spawnPoint);
-            }
+            SpawnOnceObject(prefab, spawnPoint);
         }
     }
 
+    /// <summary>
+    /// Spawn prefab in all existing spawn points.
+    /// </summary>
+    /// <param name="prefab"></param>
     public void Spawn(GameObject prefab)
     {
         foreach (var spawnPoint in _spawnPoints)
         {
-            if (!TryActivateObject(prefab, spawnPoint))
+            Spawn(prefab, spawnPoint);
+        }
+    }
+
+    /// <summary>
+    /// Spawn n prefabs at all spawn points.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="count"></param>
+    public void Spawn(GameObject prefab, int count)
+    {
+        if (count <= 0)
+            Debug.LogError("Count must be greater than 0");
+
+        foreach (var spawnPoint in _spawnPoints)
+        {
+            for (int i = 0; i < count; i++)
             {
-                SpawnOnceObject(prefab, spawnPoint);
+                Spawn(prefab, spawnPoint);
             }
         }
     }
 
-    public GameObject GetRandomPrefab()
+    /// <summary>
+    /// Spawn n prefabs in spawn point.
+    /// </summary>
+    /// <param name="prefabs"></param>
+    /// <param name="spawnPoint"></param>
+    /// <param name="count"></param>
+    public void Spawn(GameObject prefab, SpawnPoint spawnPoint, int count)
     {
-        int randomIndex = Random.Range(0, _prefabsToSpawn.Count);
+        if (count <= 0)
+            Debug.LogError("Count must be greater than 0");
 
-        return _prefabsToSpawn[randomIndex];
+        for (int i = 0; i < count; i++)
+        {
+            Spawn(prefab, spawnPoint);
+        }
     }
 
     private bool TryActivateObject(GameObject objPrefab, SpawnPoint spawnPoint)
@@ -77,6 +110,22 @@ public class Spawner : MonoBehaviour
         }
     }
 
+    private void SpawnOnceObject(GameObject prefab, SpawnPoint spawnPoint)
+    {
+        if (!prefab)
+            throw new NullReferenceException("Prefab is null");
+
+        if (!spawnPoint)
+            throw new NullReferenceException("SpawnPoint is null");
+
+        Vector3 spawnPosition = GetRandomSpawnPosition(spawnPoint);
+
+        GameObject spawningObj = Instantiate(prefab, spawnPosition, Quaternion.identity, transform);
+        spawningObj.name = prefab.name;
+
+        _spawnedObjects.Add(spawningObj);
+    }
+
     private GameObject FindNotActivatedObject(GameObject findingObject)
     {
         if (!findingObject)
@@ -100,22 +149,6 @@ public class Spawner : MonoBehaviour
         }
 
         return null;
-    }
-
-    private void SpawnOnceObject(GameObject prefab, SpawnPoint spawnPoint)
-    {
-        if (!prefab)
-            throw new NullReferenceException("Prefab is null");
-
-        if (!spawnPoint)
-            throw new NullReferenceException("SpawnPoint is null");
-
-        Vector3 spawnPosition = GetRandomSpawnPosition(spawnPoint);
-
-        GameObject spawningObj = Instantiate(prefab, spawnPosition, Quaternion.identity, transform);
-        spawningObj.name = prefab.name;
-
-        _spawnedObjects.Add(spawningObj);
     }
 
     private Vector3 GetRandomSpawnPosition(SpawnPoint spawnPoint)
