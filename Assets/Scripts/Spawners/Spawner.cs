@@ -21,22 +21,49 @@ public class Spawner : MonoBehaviour
     public List<GameObject> SpawnedObjects => _spawnedObjects;
 
     /// <summary>
+    /// Spawn prefab in position.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="position"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public void Spawn(GameObject prefab, Vector3 position)
+    {
+        Exceptor.ThrowIfNull(prefab, new ArgumentNullException("Prefab is null"));
+
+        if (!TryActivateObject(prefab, position))
+        {
+            SpawnOnceObject(prefab, position);
+        }
+    }
+
+    /// <summary>
+    /// Spawn n prefabs in position.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="position"></param>
+    /// <param name="count"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public void Spawn(GameObject prefab, Vector3 position, int count)
+    {
+        Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
+
+        for (int i = 0; i < count; i++)
+            Spawn(prefab, position);
+    }
+
+    /// <summary>
     /// Spawn prefab in spawn point.
     /// </summary>
     /// <param name="prefab"></param>
     /// <param name="spawnPoint"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     public void Spawn(GameObject prefab, SpawnPoint spawnPoint)
     {
-        if (prefab == null)
-            throw new NullReferenceException("List of Prefabs is null");
+        Exceptor.ThrowIfNull(spawnPoint, new ArgumentNullException("spawnPoint", "Spawn point is null"));
 
-        if (!spawnPoint)
-            throw new NullReferenceException("SpawnPoint is null");
+        Vector3 spawnPosition = GetRandomSpawnPosition(spawnPoint);
 
-        if (!TryActivateObject(prefab, spawnPoint))
-        {
-            SpawnOnceObject(prefab, spawnPoint);
-        }
+        Spawn(prefab, spawnPosition);
     }
 
     /// <summary>
@@ -58,8 +85,7 @@ public class Spawner : MonoBehaviour
     /// <param name="count"></param>
     public void Spawn(GameObject prefab, int count)
     {
-        if (count <= 0)
-            Debug.LogError("Count must be greater than 0");
+        Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
 
         foreach (var spawnPoint in _spawnPoints)
         {
@@ -73,13 +99,12 @@ public class Spawner : MonoBehaviour
     /// <summary>
     /// Spawn n prefabs in spawn point.
     /// </summary>
-    /// <param name="prefabs"></param>
+    /// <param name="prefab"></param>
     /// <param name="spawnPoint"></param>
     /// <param name="count"></param>
     public void Spawn(GameObject prefab, SpawnPoint spawnPoint, int count)
     {
-        if (count <= 0)
-            Debug.LogError("Count must be greater than 0");
+        Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
 
         for (int i = 0; i < count; i++)
         {
@@ -87,19 +112,22 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    private bool TryActivateObject(GameObject objPrefab, SpawnPoint spawnPoint)
+    /// <summary>
+    /// Activate object in position
+    /// </summary>
+    /// <param name="objPrefab"></param>
+    /// <param name="position"></param>
+    /// <returns>bool</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    private bool TryActivateObject(GameObject objPrefab, Vector3 position)
     {
-        if (!objPrefab)
-            throw new NullReferenceException("Object prefab is null");
-
-        if (!spawnPoint)
-            throw new NullReferenceException("SpawnPoint is null");
+        Exceptor.ThrowIfNull(objPrefab, new ArgumentNullException("Prefab is null"));
 
         GameObject notActivatedObj = FindNotActivatedObject(objPrefab);
 
         if (notActivatedObj)
         {
-            notActivatedObj.transform.position = GetRandomSpawnPosition(spawnPoint);
+            notActivatedObj.transform.position = position;
             notActivatedObj.SetActive(true);
 
             return true;
@@ -110,17 +138,12 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    private void SpawnOnceObject(GameObject prefab, SpawnPoint spawnPoint)
+
+    private void SpawnOnceObject(GameObject prefab, Vector3 position)
     {
-        if (!prefab)
-            throw new NullReferenceException("Prefab is null");
+        Exceptor.ThrowIfNull(prefab, new ArgumentNullException("Prefab is null"));
 
-        if (!spawnPoint)
-            throw new NullReferenceException("SpawnPoint is null");
-
-        Vector3 spawnPosition = GetRandomSpawnPosition(spawnPoint);
-
-        GameObject spawningObj = Instantiate(prefab, spawnPosition, Quaternion.identity, transform);
+        GameObject spawningObj = Instantiate(prefab, position, Quaternion.identity, transform);
         spawningObj.name = prefab.name;
 
         _spawnedObjects.Add(spawningObj);
@@ -128,11 +151,8 @@ public class Spawner : MonoBehaviour
 
     private GameObject FindNotActivatedObject(GameObject findingObject)
     {
-        if (!findingObject)
-            throw new NullReferenceException("Example Object is null");
-
-        if (_spawnedObjects == null)
-            throw new NullReferenceException("Spawned objects is null");
+        Exceptor.ThrowIfNull(findingObject, new ArgumentNullException("findingObject", "Finding Object is null"));
+        Exceptor.ThrowIfNull(_spawnedObjects, new NullReferenceException("Spawned objects is null"));
 
         if (_spawnedObjects.Count == 0)
             return null;
@@ -140,7 +160,7 @@ public class Spawner : MonoBehaviour
         foreach (var obj in _spawnedObjects)
         {
             if (!obj)
-                throw new NullReferenceException("Object in list spawnedObjects is null");
+                continue;
 
             if (!obj.activeInHierarchy && obj.name == findingObject.name)
             {
@@ -153,8 +173,7 @@ public class Spawner : MonoBehaviour
 
     private Vector3 GetRandomSpawnPosition(SpawnPoint spawnPoint)
     {
-        if (!spawnPoint)
-            throw new NullReferenceException("SpawnPoint is null");
+        Exceptor.ThrowIfNull(spawnPoint, new ArgumentNullException("spawnPoint", "SpawnPoint is null"));
 
         Vector3 spawnerBoundsMin = spawnPoint.BoundsMin;
         Vector3 spawnerBoundsMax = spawnPoint.BoundsMax;
@@ -162,7 +181,7 @@ public class Spawner : MonoBehaviour
         float randX = Random.Range(spawnerBoundsMin.x, spawnerBoundsMax.x);
         float randZ = Random.Range(spawnerBoundsMin.z, spawnerBoundsMax.z);
 
-        Vector3 newSpawnPosition = new Vector3(randX, 0f, randZ);
+        Vector3 newSpawnPosition = new Vector3(randX, spawnPoint.transform.position.y, randZ);
 
         if (newSpawnPosition == _oldSpawnPosition)
             return GetRandomSpawnPosition(spawnPoint);
