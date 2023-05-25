@@ -45,10 +45,7 @@ public class RandomSpawner : SpawnerBase
 
         foreach (var spawnPoint in _spawnPoints)
         {
-            for (int i = 0; i < count; i++)
-            {
-                Spawn(prefabs, spawnPoint);
-            }
+            Spawn(prefabs, spawnPoint, count);
         }
     }
 

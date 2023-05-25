@@ -25,7 +25,7 @@ public class Spawner : SpawnerBase
     /// <param name="prefab"></param>
     /// <param name="position"></param>
     /// <param name="count"></param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public override void Spawn(GameObject prefab, Vector3 position, int count)
     {
         Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));

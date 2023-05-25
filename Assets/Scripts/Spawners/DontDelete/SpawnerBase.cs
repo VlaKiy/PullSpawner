@@ -5,14 +5,6 @@ using Random = UnityEngine.Random;
 
 public abstract class SpawnerBase : MonoBehaviour
 {
-    [Serializable]
-    public struct Drop
-    {
-        public string name;
-        public GameObject objectPrefab;
-        public int dropRarity;
-    }
-
     [SerializeField] protected List<SpawnPoint> _spawnPoints;
 
     /// <summary>
@@ -276,4 +268,12 @@ public abstract class SpawnerBase : MonoBehaviour
 
         return prefabs[randomIndex];
     }
+}
+
+[Serializable]
+public struct Drop
+{
+    public string name;
+    public GameObject objectPrefab;
+    public int dropRarity;
 }
