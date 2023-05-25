@@ -113,6 +113,69 @@ public class Spawner : MonoBehaviour
     }
 
     /// <summary>
+    /// Try find all spawned objects of type Type.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="findedObjects"></param>
+    /// <returns>bool</returns>
+    public bool TryFindSpawnedObjectsOfType(Type type, out List<GameObject> findedObjects)
+    {
+        Exceptor.ThrowIfNull(type, new ArgumentNullException("Type is null"));
+        Exceptor.ThrowIfNull(SpawnedObjects, new NullReferenceException("Spawned objects is null"));
+
+        List<GameObject> objects = new List<GameObject>();
+
+        foreach (var spawnedObject in SpawnedObjects)
+        {
+            if (!spawnedObject)
+                continue;
+
+            var findedObject = spawnedObject.GetComponent(type);
+
+            if (findedObject)
+                objects.Add(findedObject.gameObject);
+        }
+
+        findedObjects = objects;
+        return findedObjects != null;
+    }
+
+    /// <summary>
+    /// Try find all spawned objects of type Type in child with name ChildName.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="childName"></param>
+    /// <param name="findedObjects"></param>
+    /// <returns>bool</returns>
+    public bool TryFindSpawnedObjectsOfType(Type type, string childName, out List<GameObject> findedObjects)
+    {
+        Exceptor.ThrowIfNull(type, new ArgumentNullException("Type is null"));
+        Exceptor.ThrowIfNull(childName, new ArgumentNullException("Name cannot be null"));
+        Exceptor.ThrowIfNull(SpawnedObjects, new NullReferenceException("Spawned objects is null"));
+
+        List<GameObject> objects = new List<GameObject>();
+
+        foreach (var spawnedObject in SpawnedObjects)
+        {
+            if (!spawnedObject)
+                continue;
+
+            var child = spawnedObject.transform.Find(childName);
+
+            if (!child)
+                continue;
+
+            var findedObject = child.GetComponent(type);
+
+            if (findedObject)
+                objects.Add(findedObject.gameObject);
+        }
+
+        findedObjects = objects;
+        return findedObjects != null;
+    }
+
+    /// <summary>
     /// Activate object in position
     /// </summary>
     /// <param name="objPrefab"></param>
@@ -137,8 +200,6 @@ public class Spawner : MonoBehaviour
             return false;
         }
     }
-
-
     private void SpawnOnceObject(GameObject prefab, Vector3 position)
     {
         Exceptor.ThrowIfNull(prefab, new ArgumentNullException("Prefab is null"));
