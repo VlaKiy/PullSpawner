@@ -1,32 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class Spawner : MonoBehaviour
+public class Spawner : SpawnerBase
 {
-    [SerializeField] private List<SpawnPoint> _spawnPoints;
-
-    private Vector3 _oldSpawnPosition;
-    private List<GameObject> _spawnedObjects = new List<GameObject>();
-
-    /// <summary>
-    /// All available spawn points.
-    /// </summary>
-    public List<SpawnPoint> SpawnPoints => _spawnPoints;
-
-    /// <summary>
-    /// All spawned objects.
-    /// </summary>
-    public List<GameObject> SpawnedObjects => _spawnedObjects;
-
     /// <summary>
     /// Spawn prefab in position.
     /// </summary>
     /// <param name="prefab"></param>
     /// <param name="position"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public void Spawn(GameObject prefab, Vector3 position)
+    public override void Spawn(GameObject prefab, Vector3 position)
     {
         Exceptor.ThrowIfNull(prefab, new ArgumentNullException("Prefab is null"));
 
@@ -43,7 +26,7 @@ public class Spawner : MonoBehaviour
     /// <param name="position"></param>
     /// <param name="count"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public void Spawn(GameObject prefab, Vector3 position, int count)
+    public override void Spawn(GameObject prefab, Vector3 position, int count)
     {
         Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
 
@@ -57,7 +40,7 @@ public class Spawner : MonoBehaviour
     /// <param name="prefab"></param>
     /// <param name="spawnPoint"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public void Spawn(GameObject prefab, SpawnPoint spawnPoint)
+    public override void Spawn(GameObject prefab, SpawnPoint spawnPoint)
     {
         Exceptor.ThrowIfNull(spawnPoint, new ArgumentNullException("spawnPoint", "Spawn point is null"));
 
@@ -70,7 +53,7 @@ public class Spawner : MonoBehaviour
     /// Spawn prefab in all existing spawn points.
     /// </summary>
     /// <param name="prefab"></param>
-    public void Spawn(GameObject prefab)
+    public override void Spawn(GameObject prefab)
     {
         foreach (var spawnPoint in _spawnPoints)
         {
@@ -83,7 +66,7 @@ public class Spawner : MonoBehaviour
     /// </summary>
     /// <param name="prefab"></param>
     /// <param name="count"></param>
-    public void Spawn(GameObject prefab, int count)
+    public override void Spawn(GameObject prefab, int count)
     {
         Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
 
@@ -102,7 +85,7 @@ public class Spawner : MonoBehaviour
     /// <param name="prefab"></param>
     /// <param name="spawnPoint"></param>
     /// <param name="count"></param>
-    public void Spawn(GameObject prefab, SpawnPoint spawnPoint, int count)
+    public override void Spawn(GameObject prefab, SpawnPoint spawnPoint, int count)
     {
         Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
 
@@ -110,144 +93,5 @@ public class Spawner : MonoBehaviour
         {
             Spawn(prefab, spawnPoint);
         }
-    }
-
-    /// <summary>
-    /// Try find all spawned objects of type Type.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="findedObjects"></param>
-    /// <returns>bool</returns>
-    public bool TryFindSpawnedObjectsOfType(Type type, out List<GameObject> findedObjects)
-    {
-        Exceptor.ThrowIfNull(type, new ArgumentNullException("Type is null"));
-        Exceptor.ThrowIfNull(SpawnedObjects, new NullReferenceException("Spawned objects is null"));
-
-        List<GameObject> objects = new List<GameObject>();
-
-        foreach (var spawnedObject in SpawnedObjects)
-        {
-            if (!spawnedObject)
-                continue;
-
-            var findedObject = spawnedObject.GetComponent(type);
-
-            if (findedObject)
-                objects.Add(findedObject.gameObject);
-        }
-
-        findedObjects = objects;
-        return findedObjects != null;
-    }
-
-    /// <summary>
-    /// Try find all spawned objects of type Type in child with name ChildName.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="childName"></param>
-    /// <param name="findedObjects"></param>
-    /// <returns>bool</returns>
-    public bool TryFindSpawnedObjectsOfType(Type type, string childName, out List<GameObject> findedObjects)
-    {
-        Exceptor.ThrowIfNull(type, new ArgumentNullException("Type is null"));
-        Exceptor.ThrowIfNull(childName, new ArgumentNullException("Name cannot be null"));
-        Exceptor.ThrowIfNull(SpawnedObjects, new NullReferenceException("Spawned objects is null"));
-
-        List<GameObject> objects = new List<GameObject>();
-
-        foreach (var spawnedObject in SpawnedObjects)
-        {
-            if (!spawnedObject)
-                continue;
-
-            var child = spawnedObject.transform.Find(childName);
-
-            if (!child)
-                continue;
-
-            var findedObject = child.GetComponent(type);
-
-            if (findedObject)
-                objects.Add(findedObject.gameObject);
-        }
-
-        findedObjects = objects;
-        return findedObjects != null;
-    }
-
-    /// <summary>
-    /// Activate object in position
-    /// </summary>
-    /// <param name="objPrefab"></param>
-    /// <param name="position"></param>
-    /// <returns>bool</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    private bool TryActivateObject(GameObject objPrefab, Vector3 position)
-    {
-        Exceptor.ThrowIfNull(objPrefab, new ArgumentNullException("Prefab is null"));
-
-        GameObject notActivatedObj = FindNotActivatedObject(objPrefab);
-
-        if (notActivatedObj)
-        {
-            notActivatedObj.transform.position = position;
-            notActivatedObj.SetActive(true);
-
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    private void SpawnOnceObject(GameObject prefab, Vector3 position)
-    {
-        Exceptor.ThrowIfNull(prefab, new ArgumentNullException("Prefab is null"));
-
-        GameObject spawningObj = Instantiate(prefab, position, Quaternion.identity, transform);
-        spawningObj.name = prefab.name;
-
-        _spawnedObjects.Add(spawningObj);
-    }
-
-    private GameObject FindNotActivatedObject(GameObject findingObject)
-    {
-        Exceptor.ThrowIfNull(findingObject, new ArgumentNullException("findingObject", "Finding Object is null"));
-        Exceptor.ThrowIfNull(_spawnedObjects, new NullReferenceException("Spawned objects is null"));
-
-        if (_spawnedObjects.Count == 0)
-            return null;
-
-        foreach (var obj in _spawnedObjects)
-        {
-            if (!obj)
-                continue;
-
-            if (!obj.activeInHierarchy && obj.name == findingObject.name)
-            {
-                return obj;
-            }
-        }
-
-        return null;
-    }
-
-    private Vector3 GetRandomSpawnPosition(SpawnPoint spawnPoint)
-    {
-        Exceptor.ThrowIfNull(spawnPoint, new ArgumentNullException("spawnPoint", "SpawnPoint is null"));
-
-        Vector3 spawnerBoundsMin = spawnPoint.BoundsMin;
-        Vector3 spawnerBoundsMax = spawnPoint.BoundsMax;
-
-        float randX = Random.Range(spawnerBoundsMin.x, spawnerBoundsMax.x);
-        float randZ = Random.Range(spawnerBoundsMin.z, spawnerBoundsMax.z);
-
-        Vector3 newSpawnPosition = new Vector3(randX, spawnPoint.transform.position.y, randZ);
-
-        if (newSpawnPosition == _oldSpawnPosition)
-            return GetRandomSpawnPosition(spawnPoint);
-
-        _oldSpawnPosition = newSpawnPosition;
-        return newSpawnPosition;
     }
 }
