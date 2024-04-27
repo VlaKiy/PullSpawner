@@ -1,4 +1,4 @@
-### Map
+# Map
 * **[Instalation](#instalation)**
 * **[Properties](#properties)**
 	* [Spawner](#spawner)
@@ -15,12 +15,12 @@
 		* [SpawnInAllSpawnPointsWithRandomPosition](#spawninallspawnpointswithrandomposition)
 		* [SpawnInAllSpawnPointsWithRandomPosition *(quantitatively)*](#spawninallspawnpointswithrandomposition-quantitatively)
 
-### Instalation
+# Instalation
 Set up **[PullSpawner v1.0.0](http://github.com/VlaKiy/PullSpawner/releases/tag/v1.0.0 "PullSpawner v1.0.0")** to your project.
 
-### Properties
-#### Spawner
-##### SpawnPoints
+# Properties
+## Spawner
+### SpawnPoints
 ```csharp
 List<SpawnPoint> SpawnPoints
 ```
@@ -28,15 +28,15 @@ All SpawnPoints added to the spawner through the inspector.
 
 ------------
 
-##### SpawnedObjects
+### SpawnedObjects
 ```csharp
 List<GameObject> SpawnedObjects
 ```
 All spawned game objects.
 
-### Functions
-#### Spawner
-##### SpawnWithCenterPosition
+# Functions
+## Spawner
+### SpawnWithCenterPosition
 ```csharp
 SpawnWithCenterPosition(GameObject prefab, SpawnPoint spawnPoint);
 ```
@@ -45,7 +45,7 @@ SpawnWithCenterPosition(GameObject prefab, SpawnPoint spawnPoint);
 
 Spawning **one prefab** with **central position** in the **chosen SpawnPoint**. 
 
-###### Example:
+#### Example:
 ```csharp
 [SerializeField] private Spawner _spawner;
 [SerializeField] private GameObject _prefab;
@@ -57,7 +57,7 @@ private void Update()
 }
 ```
 ---
-##### SpawnWithCenterPosition *(quantitatively)*
+### SpawnWithCenterPosition *(quantitatively)*
 ```csharp
 SpawnWithCenterPosition(GameObject prefab, SpawnPoint spawnPoint, int n);
 ```
@@ -67,7 +67,7 @@ SpawnWithCenterPosition(GameObject prefab, SpawnPoint spawnPoint, int n);
 
 Spawning ***n* prefabs** with **central position** in the **chosen *spawnPoint***. 
 
-###### Example:
+#### Example:
 ```csharp
 [SerializeField] private Spawner _spawner;
 [SerializeField] private GameObject _prefab;
@@ -79,7 +79,7 @@ private void Update()
 }
 ```
 ---
-##### SpawnWithRandomPosition
+### SpawnWithRandomPosition
 ```csharp
 SpawnWithRandomPosition(GameObject prefab, SpawnPoint spawnPoint);
 ```
@@ -88,7 +88,7 @@ SpawnWithRandomPosition(GameObject prefab, SpawnPoint spawnPoint);
 
 Spawning ***n* prefabs** with **random position** in the **chosen *spawnPoint***. 
 
-###### Example:
+#### Example:
 ```csharp
 [SerializeField] private Spawner _spawner;
 [SerializeField] private GameObject _prefab;
@@ -100,7 +100,7 @@ private void Update()
 }
 ```
 ---
-##### SpawnWithRandomPosition *(quantitatively)*
+### SpawnWithRandomPosition *(quantitatively)*
 ```csharp
 SpawnWithRandomPosition(GameObject prefab, SpawnPoint spawnPoint, int n);
 ```
@@ -110,7 +110,7 @@ SpawnWithRandomPosition(GameObject prefab, SpawnPoint spawnPoint, int n);
 
 Spawning ***n* prefabs** with **random position** in the **chosen *spawnPoint***. 
 
-###### Example:
+#### Example:
 ```csharp
 [SerializeField] private Spawner _spawner;
 [SerializeField] private GameObject _prefab;
@@ -122,7 +122,7 @@ private void Update()
 }
 ```
 ---
-##### SpawnInAllSpawnPointsWithCenterPosition
+### SpawnInAllSpawnPointsWithCenterPosition
 ```csharp
 SpawnInAllSpawnPointsWithCenterPosition(GameObject prefab);
 ```
@@ -130,7 +130,7 @@ SpawnInAllSpawnPointsWithCenterPosition(GameObject prefab);
 
 Spawning **one prefab** with **central position** in the **every SpawnPoints**. 
 
-###### Example:
+#### Example:
 ```csharp
 [SerializeField] private Spawner _spawner;
 [SerializeField] private GameObject _prefab;
@@ -142,7 +142,7 @@ private void Update()
 }
 ```
 ---
-##### SpawnInAllSpawnPointsWithCenterPosition *(quantitatively)*
+### SpawnInAllSpawnPointsWithCenterPosition *(quantitatively)*
 ```csharp
 SpawnInAllSpawnPointsWithCenterPosition(GameObject prefab, int n);
 ```
@@ -151,7 +151,7 @@ SpawnInAllSpawnPointsWithCenterPosition(GameObject prefab, int n);
 
 Spawning ***n* prefabs** with **central position** in the **every SpawnPoints**. 
 
-###### Example:
+#### Example:
 ```csharp
 [SerializeField] private Spawner _spawner;
 [SerializeField] private GameObject _prefab;
@@ -163,7 +163,7 @@ private void Update()
 }
 ```
 ---
-##### SpawnInAllSpawnPointsWithRandomPosition
+### SpawnInAllSpawnPointsWithRandomPosition
 ```csharp
 SpawnInAllSpawnPointsWithRandomPosition(GameObject prefab);
 ```
@@ -171,7 +171,7 @@ SpawnInAllSpawnPointsWithRandomPosition(GameObject prefab);
 
 Spawning **one prefab** with **random position** in the **every SpawnPoints**. 
 
-###### Example:
+#### Example:
 ```csharp
 [SerializeField] private Spawner _spawner;
 [SerializeField] private GameObject _prefab;
@@ -183,7 +183,7 @@ private void Update()
 }
 ```
 ---
-##### SpawnInAllSpawnPointsWithRandomPosition *(quantitatively)*
+### SpawnInAllSpawnPointsWithRandomPosition *(quantitatively)*
 ```csharp
 SpawnInAllSpawnPointsWithRandomPosition(GameObject prefab, int n);
 ```
@@ -192,7 +192,7 @@ SpawnInAllSpawnPointsWithRandomPosition(GameObject prefab, int n);
 
 Spawning ***n* prefabs** with **random position** in the **every SpawnPoints**. 
 
-###### Example:
+#### Example:
 ```csharp
 [SerializeField] private Spawner _spawner;
 [SerializeField] private GameObject _prefab;
