@@ -1,63 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class Spawner : MonoBehaviour
+public class Spawner : SpawnerBase
 {
-    [SerializeField] private List<SpawnPoint> _spawnPoints;
-
-    private Vector3 _oldSpawnPosition;
-    private List<GameObject> _spawnedObjects = new List<GameObject>();
-
     /// <summary>
-    /// All available spawn points.
-    /// </summary>
-    public List<SpawnPoint> SpawnPoints => _spawnPoints;
-
-    /// <summary>
-    /// All spawned objects.
-    /// </summary>
-    public List<GameObject> SpawnedObjects => _spawnedObjects;
-
-    /// <summary>
-    /// Spawn prefab in position.
-    /// </summary>
-    /// <param name="prefab"></param>
-    /// <param name="position"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public void Spawn(GameObject prefab, Vector3 position)
-    {
-        Exceptor.ThrowIfNull(prefab, new ArgumentNullException("Prefab is null"));
-
-        if (!TryActivateObject(prefab, position))
-        {
-            SpawnOnceObject(prefab, position);
-        }
-    }
-
-    /// <summary>
-    /// Spawn n prefabs in position.
-    /// </summary>
-    /// <param name="prefab"></param>
-    /// <param name="position"></param>
-    /// <param name="count"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public void Spawn(GameObject prefab, Vector3 position, int count)
-    {
-        Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
-
-        for (int i = 0; i < count; i++)
-            Spawn(prefab, position);
-    }
-
-    /// <summary>
-    /// Spawn prefab in spawn point.
+    /// Spawn ONCE prefab in SPAWN POINT with CENTER POSITION.
     /// </summary>
     /// <param name="prefab"></param>
     /// <param name="spawnPoint"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public void Spawn(GameObject prefab, SpawnPoint spawnPoint)
+    public override void SpawnWithCenterPosition(GameObject prefab, SpawnPoint spawnPoint)
+    {
+        Exceptor.ThrowIfNull(spawnPoint, new ArgumentNullException("spawnPoint", "Spawn point is null"));
+
+        Vector3 spawnPosition = spawnPoint.transform.position;
+
+        Spawn(prefab, spawnPosition);
+    }
+
+    /// <summary>
+    /// Spawn N prefabs in SPAWN POINT with CENTER POSITION.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="spawnPoint"></param>
+    /// <param name="n"></param>
+    public override void SpawnWithCenterPosition(GameObject prefab, SpawnPoint spawnPoint, int n)
+    {
+        Exceptor.ThrowIfTrue(n <= 0, new ArgumentOutOfRangeException("n", "Count must be greater than 0"));
+
+        for (int i = 0; i < n; i++)
+        {
+            SpawnWithCenterPosition(prefab, spawnPoint);
+        }
+    }
+
+    /// <summary>
+    /// Spawn ONCE prefab in SPAWN POINT with RANDOM POSITION.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="spawnPoint"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public override void SpawnWithRandomPosition(GameObject prefab, SpawnPoint spawnPoint)
     {
         Exceptor.ThrowIfNull(spawnPoint, new ArgumentNullException("spawnPoint", "Spawn point is null"));
 
@@ -67,126 +50,78 @@ public class Spawner : MonoBehaviour
     }
 
     /// <summary>
-    /// Spawn prefab in all existing spawn points.
-    /// </summary>
-    /// <param name="prefab"></param>
-    public void Spawn(GameObject prefab)
-    {
-        foreach (var spawnPoint in _spawnPoints)
-        {
-            Spawn(prefab, spawnPoint);
-        }
-    }
-
-    /// <summary>
-    /// Spawn n prefabs at all spawn points.
-    /// </summary>
-    /// <param name="prefab"></param>
-    /// <param name="count"></param>
-    public void Spawn(GameObject prefab, int count)
-    {
-        Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
-
-        foreach (var spawnPoint in _spawnPoints)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                Spawn(prefab, spawnPoint);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Spawn n prefabs in spawn point.
+    /// Spawn N prefabs in SPAWN POINT with RANDOM POSITION.
     /// </summary>
     /// <param name="prefab"></param>
     /// <param name="spawnPoint"></param>
-    /// <param name="count"></param>
-    public void Spawn(GameObject prefab, SpawnPoint spawnPoint, int count)
+    /// <param name="n"></param>
+    public override void SpawnWithRandomPosition(GameObject prefab, SpawnPoint spawnPoint, int n)
     {
-        Exceptor.ThrowIfTrue(count <= 0, new ArgumentOutOfRangeException("count", "Count must be greater than 0"));
+        Exceptor.ThrowIfTrue(n <= 0, new ArgumentOutOfRangeException("n", "Count must be greater than 0"));
 
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < n; i++)
         {
-            Spawn(prefab, spawnPoint);
+            SpawnWithRandomPosition(prefab, spawnPoint);
         }
     }
 
     /// <summary>
-    /// Activate object in position
+    /// Spawn ONCE prefab in ALL SPAWN POINTS with RANDOM POSITION.
     /// </summary>
-    /// <param name="objPrefab"></param>
-    /// <param name="position"></param>
-    /// <returns>bool</returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    private bool TryActivateObject(GameObject objPrefab, Vector3 position)
+    /// <param name="prefab"></param>
+    public override void SpawnInAllSpawnPointsWithRandomPosition(GameObject prefab)
     {
-        Exceptor.ThrowIfNull(objPrefab, new ArgumentNullException("Prefab is null"));
-
-        GameObject notActivatedObj = FindNotActivatedObject(objPrefab);
-
-        if (notActivatedObj)
+        foreach (var spawnPoint in _spawnPoints)
         {
-            notActivatedObj.transform.position = position;
-            notActivatedObj.SetActive(true);
-
-            return true;
-        }
-        else
-        {
-            return false;
+            SpawnWithRandomPosition(prefab, spawnPoint);
         }
     }
 
-
-    private void SpawnOnceObject(GameObject prefab, Vector3 position)
+    /// <summary>
+    /// Spawn N prefabs in ALL SPAWN POINTS with RANDOM POSITION.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="n"></param>
+    public override void SpawnInAllSpawnPointsWithRandomPosition(GameObject prefab, int n)
     {
-        Exceptor.ThrowIfNull(prefab, new ArgumentNullException("Prefab is null"));
+        Exceptor.ThrowIfTrue(n <= 0, new ArgumentOutOfRangeException("n", "Count must be greater than 0"));
 
-        GameObject spawningObj = Instantiate(prefab, position, Quaternion.identity, transform);
-        spawningObj.name = prefab.name;
-
-        _spawnedObjects.Add(spawningObj);
-    }
-
-    private GameObject FindNotActivatedObject(GameObject findingObject)
-    {
-        Exceptor.ThrowIfNull(findingObject, new ArgumentNullException("findingObject", "Finding Object is null"));
-        Exceptor.ThrowIfNull(_spawnedObjects, new NullReferenceException("Spawned objects is null"));
-
-        if (_spawnedObjects.Count == 0)
-            return null;
-
-        foreach (var obj in _spawnedObjects)
+        foreach (var spawnPoint in _spawnPoints)
         {
-            if (!obj)
-                continue;
-
-            if (!obj.activeInHierarchy && obj.name == findingObject.name)
+            for (int i = 0; i < n; i++)
             {
-                return obj;
+                SpawnWithRandomPosition(prefab, spawnPoint);
             }
         }
-
-        return null;
     }
 
-    private Vector3 GetRandomSpawnPosition(SpawnPoint spawnPoint)
+    /// <summary>
+    /// Spawn ONCE prefab in ALL SPAWN POINTS with CENTER POSITION.
+    /// </summary>
+    /// <param name="prefab"></param>
+    public override void SpawnInAllSpawnPointsWithCenterPosition(GameObject prefab)
     {
-        Exceptor.ThrowIfNull(spawnPoint, new ArgumentNullException("spawnPoint", "SpawnPoint is null"));
+        foreach (var spawnPoint in _spawnPoints)
+        {
+            SpawnWithCenterPosition(prefab, spawnPoint);
+        }
+    }
 
-        Vector3 spawnerBoundsMin = spawnPoint.BoundsMin;
-        Vector3 spawnerBoundsMax = spawnPoint.BoundsMax;
+    /// <summary>
+    /// Spawn N prefabs in ALL SPAWN POINTS with CENTER POSITION.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="n"></param>
+    public override void SpawnInAllSpawnPointsWithCenterPosition(GameObject prefab, int n)
+    {
+        Exceptor.ThrowIfTrue(n <= 0, new ArgumentOutOfRangeException("n", "Count must be greater than 0"));
 
-        float randX = Random.Range(spawnerBoundsMin.x, spawnerBoundsMax.x);
-        float randZ = Random.Range(spawnerBoundsMin.z, spawnerBoundsMax.z);
-
-        Vector3 newSpawnPosition = new Vector3(randX, spawnPoint.transform.position.y, randZ);
-
-        if (newSpawnPosition == _oldSpawnPosition)
-            return GetRandomSpawnPosition(spawnPoint);
-
-        _oldSpawnPosition = newSpawnPosition;
-        return newSpawnPosition;
+        foreach (var spawnPoint in _spawnPoints)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                SpawnWithCenterPosition(prefab, spawnPoint);
+            }
+        }
     }
 }
